@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header><div class="wrap"><a class="brand" href="index.html"><span class="brand-mark">F</span> Familio</a><h1>Datenschutzerklärung</h1><p class="meta">Gültig ab 13. August 2026 · Version 2026-08-13</p><nav><a href="terms-familio.html">Nutzungsbedingungen</a><a href="delete-account.html">Konto löschen</a><a href="support.html">Support</a><a href="impressum.html">Impressum</a></nav></div></header>
+  <header><div class="wrap"><a class="brand" href="index.html"><span class="brand-mark">F</span> Familio</a><h1>Datenschutzerklärung</h1><p class="meta">Gültig ab 14. August 2026 · Version 2026-08-14</p><nav><a href="terms-familio.html">Nutzungsbedingungen</a><a href="delete-account.html">Konto löschen</a><a href="support.html">Support</a><a href="impressum.html">Impressum</a></nav></div></header>
   <main class="wrap">
     <section class="card">
       <h2>1. Verantwortlicher</h2>
@@ -25,9 +25,11 @@
         <li><strong>Benachrichtigungsdaten:</strong> Einstellungen, Geräteplattform und Expo-Push-Token, wenn Push-Benachrichtigungen freiwillig aktiviert werden.</li>
         <li><strong>Sicherheits- und Moderationsdaten:</strong> blockierte Konten, gemeldete Inhalte, Meldegrund, Bearbeitungsstatus und Zeitstempel.</li>
         <li><strong>Technische Betriebsdaten:</strong> Serverprotokolle wie Zeitpunkt, Fehlerangaben, gekürzte technische Anfrageinformationen und gegebenenfalls IP-Adresse, soweit die eingesetzten Infrastruktur-Anbieter sie für sicheren Betrieb und Fehlerbehebung verarbeiten.</li>
+        <li><strong>Werbe- und Einwilligungsdaten:</strong> Die kostenlose Version verwendet Google Mobile Ads und die Google User Messaging Platform (UMP). Dabei können insbesondere IP-Adresse, ungefähre Region, App-Interaktionen, Diagnoseinformationen sowie Werbe-, App-Set- und weitere Gerätekennungen verarbeitet werden. UMP speichert die Auswahl zum Datenschutz und zeigt in betroffenen Regionen ein Einwilligungsformular.</li>
+        <li><strong>Kauf- und Berechtigungsdaten:</strong> Bei einem freiwilligen Kauf zur dauerhaften Entfernung von Werbung verarbeitet Google Play die Zahlung. Familio erhält und speichert Produkt-ID, Kaufstatus, Kaufzeit, Bestellreferenz, Region, einen Kaufbeleg beziehungsweise dessen Hash und die Information, ob der Kauf bestätigt und aktiv ist. Zahlungsinstrumentdaten wie die vollständige Karten- oder Kontonummer erhält DefiDev nicht.</li>
         <li><strong>Supportdaten:</strong> Angaben, die Nutzer freiwillig in einer Support-E-Mail mitteilen.</li>
       </ul>
-      <p>Familio enthält keine Werbung, kein Werbe-Tracking und keine Analyse-SDKs. DefiDev verkauft keine personenbezogenen Daten.</p>
+      <p>Familio zeigt ausschließlich dezente Bannerwerbung; es werden keine Vollbild-, Start- oder Zwangsvideo-Anzeigen eingesetzt. Ein einmaliger Google-Play-Kauf entfernt Werbung dauerhaft. DefiDev verkauft keine personenbezogenen Daten.</p>
     </section>
 
     <section class="card">
@@ -35,6 +37,9 @@
       <ul>
         <li>Kontobereitstellung, Anmeldung, Synchronisierung und gemeinsame Familienfunktionen: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).</li>
         <li>Freiwillig aktivierte Push-Benachrichtigungen: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Die Einwilligung kann über die Android-Einstellungen und in Familio jederzeit mit Wirkung für die Zukunft widerrufen werden.</li>
+        <li>Bereitstellung, Verifizierung und Wiederherstellung des einmaligen Kaufs: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung); gesetzlich erforderliche Abrechnungsaufbewahrung gegebenenfalls Art. 6 Abs. 1 lit. c DSGVO.</li>
+        <li>Personalisierte Werbung sowie das Speichern oder Auslesen nicht technisch erforderlicher Werbekennungen: Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO und, soweit anwendbar, § 25 TDDDG. Die Auswahl kann in Familio unter „Familie“ → „Datenschutz-Auswahl für Werbung“ mit Wirkung für die Zukunft geändert werden.</li>
+        <li>Nicht personalisierte oder eingeschränkte Werbung, Reichweitenmessung und Betrugsabwehr werden nur verarbeitet, soweit UMP die Anzeigenanfrage nach der regionalen Auswahl zulässt. Je nach konkretem Zweck stützt sich die Verarbeitung auf Einwilligung oder auf berechtigte Interessen an Finanzierung, Messung und Missbrauchsschutz nach Art. 6 Abs. 1 lit. f DSGVO; zwingende Einwilligungserfordernisse bleiben unberührt.</li>
         <li>Schutz vor Missbrauch, Bearbeitung von Meldungen, Systemsicherheit, Fehleranalyse und Support: Art. 6 Abs. 1 lit. f DSGVO (berechtigte Interessen an einem sicheren und zuverlässigen Dienst).</li>
         <li>Gesetzlich notwendige Aufbewahrung: Art. 6 Abs. 1 lit. c DSGVO.</li>
       </ul>
@@ -52,6 +57,8 @@
         <li><strong>Supabase:</strong> Authentifizierung, Datenbank, Echtzeit-Synchronisierung und serverseitige Kontolöschung.</li>
         <li><strong>Expo:</strong> App-Build-Infrastruktur und – nur nach Aktivierung – Vermittlung von Push-Benachrichtigungen.</li>
         <li><strong>Google Firebase Cloud Messaging:</strong> Zustellung von Android-Push-Benachrichtigungen.</li>
+        <li><strong>Google Mobile Ads und Google UMP:</strong> Einwilligungsverwaltung, Auslieferung der Bannerwerbung, Reichweitenmessung, Diagnose und Schutz vor ungültigem Traffic. Je nach Auswahl können personalisierte, nicht personalisierte oder eingeschränkte Anzeigen bereitgestellt werden.</li>
+        <li><strong>Google Play:</strong> Abwicklung des freiwilligen In-App-Kaufs, Bereitstellung des lokalisierten Preises sowie Prüfung und Bestätigung des Kaufbelegs über die Google Play Developer API.</li>
         <li><strong>GitHub Pages:</strong> Hosting dieser öffentlichen Rechts- und Supportseiten; beim Aufruf können übliche Webserver-Protokolldaten verarbeitet werden.</li>
       </ul>
       <p>Diese Anbieter verarbeiten Daten im Auftrag oder als technisch erforderliche Empfänger. Soweit eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums erfolgt, werden die dafür vorgesehenen Datenschutzmechanismen des jeweiligen Anbieters, insbesondere Angemessenheitsbeschlüsse oder EU-Standardvertragsklauseln, eingesetzt.</p>
@@ -59,7 +66,8 @@
 
     <section class="card">
       <h2>6. Speicherdauer und Löschung</h2>
-      <p>Konto-, Profil- und Familieninhalte werden grundsätzlich gespeichert, solange das Konto besteht. Bei der Kontolöschung werden Konto, Profil, Mitgliedschaft, Push-Token, persönliche Einstellungen und die vom Konto erstellten Familieninhalte gelöscht. Ist das gelöschte Konto Eigentümer einer Familie, wird die Eigentümerrolle an das älteste verbleibende Mitglied übertragen; ohne weitere Mitglieder wird die Familiengruppe gelöscht.</p>
+      <p>Konto-, Profil- und Familieninhalte werden grundsätzlich gespeichert, solange das Konto besteht. Bei der Kontolöschung werden Konto, Profil, Mitgliedschaft, Push-Token, persönliche Einstellungen, die vom Konto erstellten Familieninhalte und der Familio-Berechtigungsdatensatz für „Werbung entfernen“ gelöscht. Ist das gelöschte Konto Eigentümer einer Familie, wird die Eigentümerrolle an das älteste verbleibende Mitglied übertragen; ohne weitere Mitglieder wird die Familiengruppe gelöscht.</p>
+      <p>Familio prüft einen aktiven Kauf regelmäßig bei Google Play. Werbe-Einwilligungen werden nach den Vorgaben der Google UMP SDK gespeichert und können über die App geändert werden. Google kann Bestell- und Zahlungsdaten nach eigenen gesetzlichen Aufbewahrungspflichten weiter speichern; diese externen Datensätze werden nicht durch die Familio-Kontolöschung gelöscht.</p>
       <p>Bestätigte externe Löschanfragen werden grundsätzlich innerhalb von 30 Tagen bearbeitet. Sicherheitskopien können technisch bedingt noch für einen begrenzten Zeitraum bestehen, werden nicht aktiv weiterverarbeitet und im normalen Sicherungszyklus überschrieben. Daten können nur länger gespeichert werden, wenn eine konkrete gesetzliche Pflicht oder die notwendige Abwehr von Rechtsansprüchen dies verlangt.</p>
       <p>Einzelheiten und Löschwege: <a href="delete-account.html">Familio-Konto löschen</a>.</p>
     </section>
@@ -71,7 +79,7 @@
 
     <section class="card">
       <h2>8. Rechte betroffener Personen</h2>
-      <p>Nutzer haben im Rahmen der gesetzlichen Voraussetzungen Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Widerruf einer Einwilligung. Anfragen können an <a href="mailto:Umit.durmaz@gmx.de">Umit.durmaz@gmx.de</a> gesendet werden. Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutzaufsichtsbehörde.</p>
+      <p>Nutzer haben im Rahmen der gesetzlichen Voraussetzungen Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Widerruf einer Einwilligung. Die Werbeauswahl kann zusätzlich direkt in Familio unter „Familie“ geändert werden. Ein Widerruf wirkt für die Zukunft und berührt die Rechtmäßigkeit der vorherigen Verarbeitung nicht. Anfragen können an <a href="mailto:Umit.durmaz@gmx.de">Umit.durmaz@gmx.de</a> gesendet werden. Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutzaufsichtsbehörde.</p>
     </section>
 
     <section class="card">
