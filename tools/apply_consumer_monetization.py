@@ -392,22 +392,25 @@ def write_controller(package: str) -> None:
 
 
 def write_guide(package: str) -> None:
-    (ROOT / "PLAY_CONSOLE_MONETIZATION.md").write_text(
-        f'''# Play Console / AdMob — {package}\n\n"
-        "## Product\n"
-        "- One-time product ID: `remove_ads`\n"
-        "- Type: non-consumable / one-time product\n"
-        "- Activate the product in this app's Play Console entry.\n\n"
-        "## AdMob\n"
-        "Create a separate AdMob app and banner unit for this Android package. Never reuse another app's production IDs.\n"
-        "Provide release CI environment values `ADMOB_APP_ID` and `ADMOB_BANNER_ID`. Debug builds intentionally use Google's sample IDs.\n\n"
-        "## Privacy\n"
-        f"Privacy policy: {PRIVACY}\n"
-        "The app requests UMP consent information before loading ads and exposes privacy options when required.\n\n"
-        "## Release gate\n"
-        "Before public production release: configure the unique AdMob IDs, activate `remove_ads`, complete Data safety consistently with the actual permissions/SDKs, and perform a licensed Play test purchase.\n",
-        encoding="utf-8",
-    )
+    guide = f"""# Play Console / AdMob — {package}
+
+## Product
+- One-time product ID: `remove_ads`
+- Type: non-consumable / one-time product
+- Activate the product in this app's Play Console entry.
+
+## AdMob
+Create a separate AdMob app and banner unit for this Android package. Never reuse another app's production IDs.
+Provide release CI environment values `ADMOB_APP_ID` and `ADMOB_BANNER_ID`. Debug builds intentionally use Google's sample IDs.
+
+## Privacy
+Privacy policy: {PRIVACY}
+The app requests UMP consent information before loading ads and exposes privacy options when required.
+
+## Release gate
+Before public production release: configure the unique AdMob IDs, activate `remove_ads`, complete Data safety consistently with the actual permissions/SDKs, and perform a licensed Play test purchase.
+"""
+    (ROOT / "PLAY_CONSOLE_MONETIZATION.md").write_text(guide, encoding="utf-8")
 
 
 def main() -> None:
