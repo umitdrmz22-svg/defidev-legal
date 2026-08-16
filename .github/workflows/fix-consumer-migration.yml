@@ -1,0 +1,68 @@
+name: Fix consumer migration script
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/fix-consumer-migration.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Repair write_guide and validate Python syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("tools/apply_consumer_monetization.py")
+          text = path.read_text(encoding="utf-8")
+          replacement = '''def write_guide(package: str) -> None:
+              guide = f"""# Play Console / AdMob — {package}
+
+          ## Product
+          - One-time product ID: `remove_ads`
+          - Type: non-consumable / one-time product
+          - Activate the product in this app's Play Console entry.
+
+          ## AdMob
+          Create a separate AdMob app and banner unit for this Android package. Never reuse another app's production IDs.
+          Provide release CI environment values `ADMOB_APP_ID` and `ADMOB_BANNER_ID`. Debug builds intentionally use Google's sample IDs.
+
+          ## Privacy
+          Privacy policy: {PRIVACY}
+          The app requests UMP consent information before loading ads and exposes privacy options when required.
+
+          ## Release gate
+          Before public production release: configure the unique AdMob IDs, activate `remove_ads`, complete Data safety consistently with the actual permissions/SDKs, and perform a licensed Play test purchase.
+          """
+              (ROOT / "PLAY_CONSOLE_MONETIZATION.md").write_text(guide, encoding="utf-8")
+
+
+          def main() -> None:
+          '''
+          updated, count = re.subn(
+              r'def write_guide\(package: str\) -> None:.*?def main\(\) -> None:\n',
+              replacement,
+              text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit(f"Expected one write_guide block, replaced {count}")
+          path.write_text(updated, encoding="utf-8")
+          PY
+          python3 -m py_compile tools/apply_consumer_monetization.py
+      - name: Commit repaired script
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name "DefiDev Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/apply_consumer_monetization.py
+          git commit -m "Fix consumer monetization migration syntax"
+          git push
