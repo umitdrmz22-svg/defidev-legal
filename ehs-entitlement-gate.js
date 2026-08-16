@@ -19,7 +19,6 @@
   const SUPABASE_URL = 'https://rqvcbjomrjccyuchxpuh.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_iKh-ZfqV3iJpr_9b7SErEA_XhrqnSsY';
   const SUPABASE_STORAGE_KEY = 'sb-rqvcbjomrjccyuchxpuh-auth-token';
-  const LEGACY = 'ehs_pro_monthly';
   const ACCESS_KEY = 'defidev_ehs_access_token';
   const REFRESH_KEY = 'defidev_ehs_refresh_token';
   const CLASS = 'defidev-ehs-license-checking';
@@ -39,6 +38,8 @@
     #defidevEhsLicenseGate .status{font-size:13px;min-height:20px;margin-top:10px}
     #defidevEhsLicenseGate .price{font-weight:800;color:#172033}
     #defidevEhsLicenseGate .small{font-size:12px}
+    #defidevEhsReadBanner{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483000;background:#172033;color:#fff;border-radius:12px;padding:10px 14px;font:600 13px/1.35 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.18);text-align:center}
+    html[data-defidev-ehs-mode="read"] input:disabled,html[data-defidev-ehs-mode="read"] textarea:disabled,html[data-defidev-ehs-mode="read"] select:disabled{opacity:.72;cursor:not-allowed}
   `;
   document.head.appendChild(style);
 
@@ -125,31 +126,79 @@
     syncSupabaseStorage(activeToken, user);
     return { user, token: activeToken };
   };
-  const isEntitled = row => {
-    if (!row) return false;
-    if (!['active', 'grace', 'canceled'].includes(row.status)) return false;
-    if (!row.expires_at) return true;
-    return Date.parse(row.expires_at) > Date.now();
-  };
-  const checkEntitlement = async auth => {
-    const query = new URLSearchParams({
-      select: 'product_id,status,expires_at',
-      user_id: `eq.${auth.user.id}`,
-    });
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/ehs_subscriptions?${query}`, {
+  const getModuleAccess = async auth => {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/get-ehs-entitlements`, {
+      method: 'GET',
       headers: headers(auth.token),
       cache: 'no-store',
     });
-    if (!response.ok) return false;
-    const rows = await safeJson(response);
-    return Array.isArray(rows) && rows.some(row =>
-      (row.product_id === productId || row.product_id === LEGACY) && isEntitled(row)
-    );
+    if (!response.ok) return null;
+    const payload = await safeJson(response);
+    if (!Array.isArray(payload?.modules)) return null;
+    const access = payload.modules.find(item => item?.productId === productId);
+    return access?.active ? access : null;
   };
-  const reveal = () => {
+
+  const lockReaderControls = () => {
+    document.querySelectorAll('input,textarea,select,[contenteditable="true"]').forEach(el => {
+      if (el.closest('#defidevEhsLicenseGate')) return;
+      if (el.matches('input[type="search"],input[role="searchbox"]')) return;
+      if (el.matches('[contenteditable="true"]')) {
+        el.setAttribute('contenteditable', 'false');
+        el.setAttribute('aria-readonly', 'true');
+      } else {
+        el.disabled = true;
+        el.setAttribute('aria-disabled', 'true');
+      }
+    });
+    const mutating = /(speichern|save|löschen|loeschen|delete|entfernen|remove|erstellen|create|hochladen|upload|import|freigeben|approve|ablehnen|reject|bearbeiten|edit|update|hinzufügen|hinzufuegen|\badd\b|senden|submit)/i;
+    document.querySelectorAll('button,[role="button"]').forEach(el => {
+      if (el.closest('#defidevEhsLicenseGate')) return;
+      const text = [el.id, el.className, el.getAttribute('name'), el.getAttribute('title'), el.getAttribute('aria-label'), el.textContent]
+        .filter(Boolean).join(' ');
+      if (!mutating.test(text)) return;
+      if ('disabled' in el) el.disabled = true;
+      el.setAttribute('aria-disabled', 'true');
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '.55';
+    });
+  };
+  const applyAccessMode = access => {
+    const mode = access?.mode === 'read' ? 'read' : 'edit';
+    document.documentElement.dataset.defidevEhsMode = mode;
+    globalThis.DefiDevEHSAccess = Object.freeze({
+      productId,
+      mode,
+      sources: Array.isArray(access?.sources) ? [...access.sources] : [],
+      works: Array.isArray(access?.works) ? access.works.map(w => ({ ...w })) : [],
+    });
+    if (mode !== 'read') return;
+    const addBanner = () => {
+      if (document.getElementById('defidevEhsReadBanner')) return;
+      const banner = document.createElement('div');
+      banner.id = 'defidevEhsReadBanner';
+      banner.textContent = 'Firmenlizenz · Lesemodus — Änderungen sind für diesen Benutzer gesperrt.';
+      document.body.appendChild(banner);
+    };
+    lockReaderControls();
+    addBanner();
+    const observer = new MutationObserver(() => lockReaderControls());
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    document.addEventListener('submit', event => {
+      if (!event.target.closest('#defidevEhsLicenseGate')) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+  };
+
+  const reveal = access => {
     document.getElementById('defidevEhsLicenseGate')?.remove();
     document.documentElement.classList.remove(CLASS);
-    window.dispatchEvent(new CustomEvent('defidev-ehs-entitlement-ready', { detail: { productId, entitled: true } }));
+    applyAccessMode(access);
+    window.dispatchEvent(new CustomEvent('defidev-ehs-entitlement-ready', {
+      detail: { productId, entitled: true, mode: access?.mode || 'edit', sources: access?.sources || [], works: access?.works || [] },
+    }));
   };
   const gate = () => {
     let root = document.getElementById('defidevEhsLicenseGate');
@@ -165,14 +214,14 @@
     if (mode === 'login') {
       root.innerHTML = `<div class="ehs-card">
         <h1>${moduleTitle}</h1>
-        <p>Dieses Modul ist Teil von <b>DefiDev EHS</b> und benötigt ein aktives Modul-Abonnement.</p>
+        <p>Dieses Modul ist Teil von <b>DefiDev EHS</b> und benötigt eine aktive Einzel- oder Firmenlizenz.</p>
         <form id="defidevEhsLoginForm">
           <label for="defidevEhsEmail">E-Mail</label><input id="defidevEhsEmail" type="email" autocomplete="email" required>
           <label for="defidevEhsPassword">Passwort</label><input id="defidevEhsPassword" type="password" autocomplete="current-password" required>
           <button type="submit">Anmelden und Lizenz prüfen</button>
         </form>
         <div class="status" id="defidevEhsStatus">${text}</div>
-        <p class="small">Ein Abonnement wird ausschließlich in der DefiDev-EHS-Android-App über Google Play abgeschlossen.</p>
+        <p class="small">Einzelabos werden in der DefiDev-EHS-Android-App über Google Play abgeschlossen. Firmen-/Werk-Lizenzen werden zentral zugewiesen.</p>
       </div>`;
       root.querySelector('#defidevEhsLoginForm')?.addEventListener('submit', async event => {
         event.preventDefault();
@@ -197,9 +246,9 @@
     }
     root.innerHTML = `<div class="ehs-card">
       <h1>${moduleTitle}</h1>
-      <p>Für dieses Modul wurde kein aktives Abonnement gefunden.</p>
-      <p class="price">Startpreis Deutschland: 4,99 € / Monat</p>
-      <p>Öffnen Sie die DefiDev-EHS-Android-App, um genau dieses Modul über Google Play zu abonnieren oder einen bestehenden Kauf wiederherzustellen.</p>
+      <p>Für dieses Modul wurde keine aktive Einzel- oder Firmenlizenz gefunden.</p>
+      <p class="price">Einzelabo Deutschland: 4,99 € / Monat</p>
+      <p>Ein Einzelabo kann in der DefiDev-EHS-Android-App über Google Play abgeschlossen werden. Firmenzugänge werden durch die Werk-Administration zugewiesen.</p>
       <button type="button" id="defidevEhsRetry">Lizenz erneut prüfen</button>
       <button type="button" class="secondary" id="defidevEhsLogout">Abmelden</button>
       <div class="status">${text}</div>
@@ -215,8 +264,8 @@
       return;
     }
     localStorage.setItem(ACCESS_KEY, auth.token);
-    const entitled = await checkEntitlement(auth);
-    if (entitled) reveal();
+    const access = await getModuleAccess(auth);
+    if (access) reveal(access);
     else setGateContent('locked');
   };
 
