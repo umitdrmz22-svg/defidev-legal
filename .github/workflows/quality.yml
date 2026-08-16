@@ -1,0 +1,32 @@
+name: Legal and EHS gate quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: EHS entitlement gate syntax
+        run: node --check ehs-entitlement-gate.js
+      - name: Required EHS product contracts
+        run: |
+          for product in \
+            ehs_ba_monthly \
+            ehs_fluchtplan_monthly \
+            ehs_brandschutzordnung_monthly \
+            ehs_gefahrstoffkataster_monthly \
+            ehs_dokumentmanagement_monthly \
+            ehs_unfallmanagement_monthly; do
+            grep -Fq "$product" ehs-entitlement-gate.js
+          done
+          grep -Fq 'organizationId' ehs-entitlement-gate.js
+          grep -Fq 'selectedWerk' ehs-entitlement-gate.js
