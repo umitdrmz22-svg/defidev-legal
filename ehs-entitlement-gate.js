@@ -21,6 +21,7 @@
   const SUPABASE_STORAGE_KEY = 'sb-rqvcbjomrjccyuchxpuh-auth-token';
   const ACCESS_KEY = 'defidev_ehs_access_token';
   const REFRESH_KEY = 'defidev_ehs_refresh_token';
+  const WORK_KEY = `defidev_ehs_selected_werk_${productId}`;
   const CLASS = 'defidev-ehs-license-checking';
 
   document.documentElement.classList.add(CLASS);
@@ -32,7 +33,7 @@
     #defidevEhsLicenseGate h1{margin:0 0 8px;font-size:26px;line-height:1.2}
     #defidevEhsLicenseGate p{margin:8px 0;color:#526071;line-height:1.5}
     #defidevEhsLicenseGate label{display:block;margin:12px 0 4px;font-size:13px;font-weight:700}
-    #defidevEhsLicenseGate input{width:100%;box-sizing:border-box;border:1px solid #bfcadb;border-radius:10px;padding:12px;font:inherit}
+    #defidevEhsLicenseGate input,#defidevEhsLicenseGate select{width:100%;box-sizing:border-box;border:1px solid #bfcadb;border-radius:10px;padding:12px;font:inherit;background:#fff;color:#172033}
     #defidevEhsLicenseGate button{width:100%;border:0;border-radius:10px;padding:12px 14px;margin-top:12px;font:inherit;font-weight:700;background:#2457c5;color:#fff;cursor:pointer}
     #defidevEhsLicenseGate button.secondary{background:#eef3fb;color:#26364f}
     #defidevEhsLicenseGate .status{font-size:13px;min-height:20px;margin-top:10px}
@@ -43,6 +44,7 @@
   `;
   document.head.appendChild(style);
 
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const safeJson = async response => {
     try { return await response.json(); } catch { return {}; }
   };
@@ -94,6 +96,7 @@
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(SUPABASE_STORAGE_KEY);
+    localStorage.removeItem(WORK_KEY);
   };
   const refreshSession = async () => {
     const refreshToken = localStorage.getItem(REFRESH_KEY) || '';
@@ -163,21 +166,32 @@
       el.style.opacity = '.55';
     });
   };
-  const applyAccessMode = access => {
-    const mode = access?.mode === 'read' ? 'read' : 'edit';
+  const accessForWerk = (access, selectedWerk) => {
+    if (!selectedWerk) return access;
+    return {
+      ...access,
+      mode: selectedWerk.seatType === 'editor' ? 'edit' : 'read',
+      selectedWerk,
+    };
+  };
+  const applyAccessMode = (access, selectedWerk = null) => {
+    const effective = accessForWerk(access, selectedWerk);
+    const mode = effective?.mode === 'read' ? 'read' : 'edit';
     document.documentElement.dataset.defidevEhsMode = mode;
     globalThis.DefiDevEHSAccess = Object.freeze({
       productId,
       mode,
-      sources: Array.isArray(access?.sources) ? [...access.sources] : [],
-      works: Array.isArray(access?.works) ? access.works.map(w => ({ ...w })) : [],
+      sources: Array.isArray(effective?.sources) ? [...effective.sources] : [],
+      works: Array.isArray(effective?.works) ? effective.works.map(w => ({ ...w })) : [],
+      selectedWerk: selectedWerk ? { ...selectedWerk } : null,
+      organizationId: selectedWerk?.organizationId || null,
     });
-    if (mode !== 'read') return;
+    if (mode !== 'read') return effective;
     const addBanner = () => {
       if (document.getElementById('defidevEhsReadBanner')) return;
       const banner = document.createElement('div');
       banner.id = 'defidevEhsReadBanner';
-      banner.textContent = 'Firmenlizenz · Lesemodus — Änderungen sind für diesen Benutzer gesperrt.';
+      banner.textContent = `Firmenlizenz · Lesemodus${selectedWerk?.name ? ` · ${selectedWerk.name}` : ''} — Änderungen sind für diesen Benutzer gesperrt.`;
       document.body.appendChild(banner);
     };
     lockReaderControls();
@@ -190,14 +204,23 @@
         event.stopImmediatePropagation();
       }
     }, true);
+    return effective;
   };
 
-  const reveal = access => {
+  const reveal = (access, selectedWerk = null) => {
     document.getElementById('defidevEhsLicenseGate')?.remove();
     document.documentElement.classList.remove(CLASS);
-    applyAccessMode(access);
+    const effective = applyAccessMode(access, selectedWerk);
     window.dispatchEvent(new CustomEvent('defidev-ehs-entitlement-ready', {
-      detail: { productId, entitled: true, mode: access?.mode || 'edit', sources: access?.sources || [], works: access?.works || [] },
+      detail: {
+        productId,
+        entitled: true,
+        mode: effective?.mode || 'edit',
+        sources: effective?.sources || [],
+        works: effective?.works || [],
+        selectedWerk: selectedWerk ? { ...selectedWerk } : null,
+        organizationId: selectedWerk?.organizationId || null,
+      },
     }));
   };
   const gate = () => {
@@ -208,6 +231,41 @@
     root.innerHTML = `<div class="ehs-card"><h1>${moduleTitle}</h1><p>Lizenz wird geprüft …</p><div class="status" role="status"></div></div>`;
     document.body.appendChild(root);
     return root;
+  };
+  const chooseWerk = access => {
+    const works = Array.isArray(access?.works) ? access.works.filter(w => w?.id && w?.organizationId) : [];
+    if (!works.length) {
+      reveal(access, null);
+      return;
+    }
+    const storedId = localStorage.getItem(WORK_KEY) || '';
+    const stored = works.find(w => String(w.id) === storedId);
+    if (works.length === 1 || stored) {
+      const selected = stored || works[0];
+      localStorage.setItem(WORK_KEY, String(selected.id));
+      reveal(access, selected);
+      return;
+    }
+    const root = gate();
+    root.innerHTML = `<div class="ehs-card">
+      <h1>${moduleTitle}</h1>
+      <p>Dieses Konto hat Zugriff auf mehrere Werke. Bitte wählen Sie das Werk, dessen Daten Sie öffnen möchten.</p>
+      <label for="defidevEhsWerkSelect">Werk</label>
+      <select id="defidevEhsWerkSelect">
+        ${works.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.name || w.code || 'Werk')}${w.code ? ` · ${escapeHtml(w.code)}` : ''}${w.seatType === 'reader' ? ' · Leser' : ' · Bearbeiter'}</option>`).join('')}
+      </select>
+      <button type="button" id="defidevEhsWerkOpen">Werk öffnen</button>
+      <button type="button" class="secondary" id="defidevEhsLogout">Abmelden</button>
+      <div class="status">Die Auswahl gilt nur für dieses EHS-Modul und kann durch Abmelden zurückgesetzt werden.</div>
+    </div>`;
+    root.querySelector('#defidevEhsWerkOpen')?.addEventListener('click', () => {
+      const id = String(root.querySelector('#defidevEhsWerkSelect')?.value || '');
+      const selected = works.find(w => String(w.id) === id);
+      if (!selected) return;
+      localStorage.setItem(WORK_KEY, String(selected.id));
+      reveal(access, selected);
+    });
+    root.querySelector('#defidevEhsLogout')?.addEventListener('click', () => { clearSession(); setGateContent('login'); });
   };
   const setGateContent = (mode, text = '') => {
     const root = gate();
@@ -265,7 +323,7 @@
     }
     localStorage.setItem(ACCESS_KEY, auth.token);
     const access = await getModuleAccess(auth);
-    if (access) reveal(access);
+    if (access) chooseWerk(access);
     else setGateContent('locked');
   };
 
