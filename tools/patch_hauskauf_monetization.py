@@ -6,6 +6,7 @@ root = Path.cwd()
 app_path = root / 'app.json'
 index_path = root / 'index.ts'
 privacy_path = root / 'public' / 'datenschutz.html'
+data_safety_path = root / 'docs' / 'PLAY_DATA_SAFETY.md'
 
 if not app_path.exists() or not index_path.exists():
     raise SystemExit('Hauskauf project files not found')
@@ -33,9 +34,6 @@ plugins += [
     }],
 ]
 expo['plugins'] = plugins
-# Keep the proven legacy architecture for the first billing/ads release. This can
-# be re-enabled after a production device test on the current RN/Expo pair.
-expo['newArchEnabled'] = False
 android = expo.setdefault('android', {})
 android['blockedPermissions'] = [
     permission for permission in android.get('blockedPermissions', [])
@@ -66,6 +64,16 @@ if privacy_path.exists():
         'Stand: 16.08.2026 · Technische Vorabfassung.',
     )
     privacy_path.write_text(privacy, encoding='utf-8')
+
+if data_safety_path.exists():
+    data = data_safety_path.read_text(encoding='utf-8')
+    data = data.replace('Stand: 14.08.2026', 'Stand: 16.08.2026')
+    data = data.replace('- keine Advertising ID\n- kein Werbe-SDK\n- kein Analytics-/Tracking-SDK in der App\n', '')
+    marker = '## Relevante vom Nutzer bereitgestellte Information\n'
+    ads_section = '''## Werbung und Geräte-/Werbedaten\n\nDie kostenlose Android-Version enthält Google AdMob. Abhängig von Region, Einwilligungsstatus und Anzeigenmodus können Google bzw. eingebundene Werbepartner technische Geräte-/App-Informationen, IP-Adresse, Advertising ID/Werbe-ID, Diagnoseinformationen und Anzeigeninteraktionen verarbeiten. Diese Verarbeitung ist von der fachlichen Immobilienanalyse getrennt; die eingegebene Immobilienadresse wird von Hauskauf Kompass nicht an AdMob übergeben, um ein Werbeprofil zur Immobilie zu bilden.\n\nVor dem ersten Anzeigenabruf wird der Consent-Status über die Google User Messaging Platform (UMP) abgefragt. Der finale Play-Data-Safety-Fragebogen muss anhand des tatsächlich ausgelieferten AdMob-SDKs, der in AdMob gewählten Anzeigen-/Partnerkonfiguration und des Consent-Modus beantwortet werden.\n\nGoogle Play Billing verarbeitet für den einmaligen Kauf `hauskauf_remove_ads` technische Kauf-/Produktinformationen. Zahlungsdaten werden von Google Play verarbeitet und nicht von Hauskauf Kompass gespeichert.\n\n'''
+    if '## Werbung und Geräte-/Werbedaten' not in data:
+        data = data.replace(marker, ads_section + marker)
+    data_safety_path.write_text(data, encoding='utf-8')
 
 (root / 'PLAY_CONSOLE_MONETIZATION.md').write_text('''# Hauskauf Kompass — Google Play Monetarisierung
 
