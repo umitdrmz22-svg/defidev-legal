@@ -3,44 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Datenschutzhinweise für lokale Netzwerk-Apps von DefiDev.">
-  <title>Datenschutz – lokale Netzwerk-Apps</title>
+  <meta name="description" content="Ergänzende Datenschutzhinweise für LocalCam, StageCue und CameraDrop von DefiDev.">
+  <title>Datenschutz – lokale Gerätefunktionen</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <a class="brand" href="index.html"><span class="brand-mark">D</span> DefiDev</a>
-      <h1>Datenschutz für lokale Netzwerk-Apps</h1>
-      <p class="meta">CameraDrop, LocalCam und StageCue – technische Vorabversionen</p>
-      <nav aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="support.html">Support</a><a href="impressum.html">Impressum</a></nav>
-    </div>
-  </header>
+  <header><div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">D</span> DefiDev</a>
+    <h1>Datenschutz – lokale Gerätefunktionen</h1>
+    <p class="meta">LocalCam, StageCue und CameraDrop · Stand: 16. August 2026</p>
+    <nav aria-label="Hauptnavigation"><a href="privacy-consumer.html">Consumer-Datenschutz</a><a href="support.html">Support</a><a href="impressum.html">Impressum</a></nav>
+  </div></header>
   <main class="wrap">
-    <section class="card notice">
-      <h2>Nicht für Google Play freigegeben</h2>
-      <p>Diese drei Apps sind noch nicht für eine öffentliche Google-Play-Veröffentlichung freigegeben. Die aktuelle lokale Netzwerkübertragung besitzt noch keine Ende-zu-Ende-Verschlüsselung. Verwende die Vorabversionen nur in einem vertrauenswürdigen, privaten WLAN und übertrage keine vertraulichen Inhalte.</p>
+    <section class="card">
+      <h2>1. Geltungsbereich</h2>
+      <p>Diese Hinweise ergänzen die <a href="privacy-consumer.html">Datenschutzerklärung für DefiDev Consumer Apps</a>. Dort sind insbesondere Google AdMob/UMP, Google Play Billing, Betroffenenrechte und die Anbieterinformationen beschrieben.</p>
     </section>
     <section class="card">
-      <h2>Verantwortlicher und Kontakt</h2>
-      <p>DefiDev, Inhaber Ümit Durmaz<br>E-Mail: <a href="mailto:Umit.durmaz@gmx.de">Umit.durmaz@gmx.de</a></p>
-      <p>Die Apps enthalten kein Werbe-, Tracking- oder Analyse-SDK und benötigen kein Benutzerkonto.</p>
+      <h2>2. LocalCam</h2>
+      <p>LocalCam überträgt Kamerabilder ausschließlich zwischen den vom Nutzer gekoppelten Geräten im lokalen WLAN. Für jede Kamera-Sitzung wird ein neuer 16-stelliger Kopplungscode erzeugt. Die Bilddaten werden vor der Netzwerkübertragung mit AES-256-GCM verschlüsselt und am Empfangsgerät entschlüsselt. Abrufe werden zusätzlich zeitgebunden mit HMAC-SHA-256 authentisiert. DefiDev betreibt für diese Bildübertragung keinen Cloud-Server und erhält die Kamerabilder oder den Kopplungscode nicht.</p>
     </section>
     <section class="card">
-      <h2>Verarbeitete Daten</h2>
-      <ul>
-        <li><strong>CameraDrop:</strong> Von dir aufgenommene Fotos werden auf deine ausdrückliche Aktion im lokalen WLAN an das gekoppelte Gerät übertragen.</li>
-        <li><strong>LocalCam:</strong> Kamerabilder werden im lokalen WLAN für das von dir geöffnete Empfangsgerät bereitgestellt.</li>
-        <li><strong>StageCue:</strong> Bühnenhinweise und Steuerbefehle werden zwischen den von dir verwendeten Geräten im lokalen WLAN übertragen.</li>
-      </ul>
-      <p>DefiDev betreibt dafür keinen Cloud-Server und erhält diese Inhalte nicht. Andere Geräte oder Personen im selben Netzwerk könnten unverschlüsselte Übertragungen jedoch unter Umständen beobachten oder manipulieren.</p>
+      <h2>3. StageCue</h2>
+      <p>StageCue überträgt Countdown-, Sprecher- und Cue-Daten zwischen Display und Controller im lokalen WLAN. Die Sitzung verwendet einen 16-stelligen Kopplungscode. Cue-Pakete werden mit AES-256-GCM verschlüsselt und authentisiert; ein Zeitfenster und eine Replay-Prüfung verhindern die erneute Annahme alter Pakete. DefiDev erhält diese Bühneninhalte nicht.</p>
     </section>
     <section class="card">
-      <h2>Speicherung und Löschung</h2>
-      <p>Lokale Einstellungen und Inhalte bleiben bis zur Löschung in der jeweiligen App oder bis zur Deinstallation auf dem Gerät. Weil DefiDev diese Daten nicht erhält, kann DefiDev sie nicht aus der Ferne einsehen oder löschen.</p>
-      <p>Für Datenschutzanliegen genügt eine E-Mail an <a href="mailto:Umit.durmaz@gmx.de">Umit.durmaz@gmx.de</a>. Vor einer späteren öffentlichen Veröffentlichung werden Sicherheitsarchitektur, App-Verhalten und diese Hinweise erneut geprüft.</p>
+      <h2>4. CameraDrop</h2>
+      <p>CameraDrop betreibt keinen eigenen lokalen Web- oder HTTP-Server mehr. Aufgenommene Fotos werden im privaten App-Speicher abgelegt. Eine Übertragung erfolgt nur, wenn der Nutzer in der App ausdrücklich <em>Teilen</em> auswählt und anschließend im Android-Sharesheet einen Empfänger oder eine Ziel-App auswählt. Hierfür wird zeitlich begrenzt ein Android-<code>content://</code>-Zugriff auf die ausgewählte Datei erteilt. DefiDev erhält die Fotos nicht.</p>
+    </section>
+    <section class="card">
+      <h2>5. Speicherung und Löschung</h2>
+      <p>Lokale Inhalte bleiben grundsätzlich auf den beteiligten Endgeräten, bis sie in der jeweiligen App gelöscht oder die App deinstalliert wird. Kopplungscodes werden nur für die jeweilige lokale Sitzung verwendet. Da DefiDev die lokal übertragenen Inhalte nicht erhält, kann DefiDev sie nicht aus der Ferne einsehen oder löschen.</p>
+    </section>
+    <section class="card">
+      <h2>6. Werbung und Käufe</h2>
+      <p>Die kostenlose Version kann Google-AdMob-Werbung enthalten; außerdem kann die dauerhafte Option „Werbung entfernen“ über Google Play Billing angeboten werden. Einzelheiten zu dabei verarbeiteten technischen Daten, Einwilligung über Google UMP und Rechtsgrundlagen stehen in der <a href="privacy-consumer.html">allgemeinen Consumer-Datenschutzerklärung</a>.</p>
     </section>
   </main>
-  <footer class="wrap">DefiDev / Ümit Durmaz · Stand: 14. August 2026</footer>
+  <footer class="wrap">DefiDev / Ümit Durmaz · <a href="privacy-consumer.html">Datenschutz</a> · <a href="impressum.html">Impressum</a></footer>
 </body>
 </html>
