@@ -18,6 +18,7 @@
 
   const SUPABASE_URL = 'https://rqvcbjomrjccyuchxpuh.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_iKh-ZfqV3iJpr_9b7SErEA_XhrqnSsY';
+  const SUPABASE_STORAGE_KEY = 'sb-rqvcbjomrjccyuchxpuh-auth-token';
   const LEGACY = 'ehs_pro_monthly';
   const ACCESS_KEY = 'defidev_ehs_access_token';
   const REFRESH_KEY = 'defidev_ehs_refresh_token';
@@ -49,6 +50,29 @@
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   });
+  const decodeJwt = token => {
+    try {
+      const part = token.split('.')[1];
+      const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+      return JSON.parse(atob(padded));
+    } catch { return {}; }
+  };
+  const syncSupabaseStorage = (token, user, refreshToken = '') => {
+    if (!token || !user?.id) return;
+    const jwt = decodeJwt(token);
+    const expiresAt = Number(jwt.exp || 0);
+    const now = Math.floor(Date.now() / 1000);
+    const session = {
+      access_token: token,
+      token_type: 'bearer',
+      expires_in: Math.max(0, expiresAt - now),
+      expires_at: expiresAt,
+      refresh_token: refreshToken || localStorage.getItem(REFRESH_KEY) || '',
+      user,
+    };
+    try { localStorage.setItem(SUPABASE_STORAGE_KEY, JSON.stringify(session)); } catch {}
+  };
   const parseFragmentToken = () => {
     const raw = location.hash.startsWith('#') ? location.hash.slice(1) : '';
     const params = new URLSearchParams(raw);
@@ -61,10 +85,14 @@
   const storeSession = payload => {
     if (payload?.access_token) localStorage.setItem(ACCESS_KEY, payload.access_token);
     if (payload?.refresh_token) localStorage.setItem(REFRESH_KEY, payload.refresh_token);
+    if (payload?.access_token && payload?.user) {
+      syncSupabaseStorage(payload.access_token, payload.user, payload.refresh_token || '');
+    }
   };
   const clearSession = () => {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(SUPABASE_STORAGE_KEY);
   };
   const refreshSession = async () => {
     const refreshToken = localStorage.getItem(REFRESH_KEY) || '';
@@ -93,7 +121,9 @@
     }
     if (!response.ok) return null;
     const user = await safeJson(response);
-    return user?.id ? { user, token: activeToken } : null;
+    if (!user?.id) return null;
+    syncSupabaseStorage(activeToken, user);
+    return { user, token: activeToken };
   };
   const isEntitled = row => {
     if (!row) return false;
