@@ -39,8 +39,13 @@
     #defidevEhsLicenseGate .status{font-size:13px;min-height:20px;margin-top:10px}
     #defidevEhsLicenseGate .price{font-weight:800;color:#172033}
     #defidevEhsLicenseGate .small{font-size:12px}
+    #defidevEhsWerkSwitcher{position:fixed;top:12px;right:12px;z-index:2147482900;display:flex;align-items:center;gap:8px;max-width:min(440px,calc(100vw - 24px));padding:8px 9px 8px 12px;border:1px solid #d7e1e7;border-radius:13px;background:rgba(255,255,255,.97);color:#22333b;box-shadow:0 8px 26px rgba(20,45,56,.14);font:600 12px/1.3 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backdrop-filter:blur(8px)}
+    #defidevEhsWerkSwitcher .werk-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #defidevEhsWerkSwitcher button{flex:none;border:0;border-radius:9px;padding:7px 9px;background:#eaf2f5;color:#174c59;font:700 12px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}
+    #defidevEhsWerkSwitcher button:hover{background:#dcecef}
     #defidevEhsReadBanner{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483000;background:#172033;color:#fff;border-radius:12px;padding:10px 14px;font:600 13px/1.35 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.18);text-align:center}
     html[data-defidev-ehs-mode="read"] input:disabled,html[data-defidev-ehs-mode="read"] textarea:disabled,html[data-defidev-ehs-mode="read"] select:disabled{opacity:.72;cursor:not-allowed}
+    @media(max-width:620px){#defidevEhsWerkSwitcher{top:8px;right:8px;left:8px;max-width:none;justify-content:space-between}}
   `;
   document.head.appendChild(style);
 
@@ -156,7 +161,7 @@
     });
     const mutating = /(speichern|save|löschen|loeschen|delete|entfernen|remove|erstellen|create|hochladen|upload|import|freigeben|approve|ablehnen|reject|bearbeiten|edit|update|hinzufügen|hinzufuegen|\badd\b|senden|submit)/i;
     document.querySelectorAll('button,[role="button"]').forEach(el => {
-      if (el.closest('#defidevEhsLicenseGate')) return;
+      if (el.closest('#defidevEhsLicenseGate') || el.closest('#defidevEhsWerkSwitcher')) return;
       const text = [el.id, el.className, el.getAttribute('name'), el.getAttribute('title'), el.getAttribute('aria-label'), el.textContent]
         .filter(Boolean).join(' ');
       if (!mutating.test(text)) return;
@@ -207,10 +212,39 @@
     return effective;
   };
 
+  const addWerkSwitcher = (access, selectedWerk) => {
+    document.getElementById('defidevEhsWerkSwitcher')?.remove();
+    if (!selectedWerk?.id) return;
+    const works = Array.isArray(access?.works)
+      ? access.works.filter(w => w?.id && w?.organizationId)
+      : [];
+    const wrap = document.createElement('div');
+    wrap.id = 'defidevEhsWerkSwitcher';
+    wrap.setAttribute('role', 'status');
+    wrap.setAttribute('aria-label', 'Ausgewähltes Werk');
+    const label = document.createElement('span');
+    label.className = 'werk-name';
+    label.textContent = `Werk: ${selectedWerk.name || selectedWerk.code || 'Ausgewählt'}${selectedWerk.seatType === 'reader' ? ' · Leser' : ' · Bearbeiter'}`;
+    wrap.appendChild(label);
+    if (works.length > 1) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = 'Wechseln';
+      button.setAttribute('aria-label', 'Werk wechseln');
+      button.addEventListener('click', () => {
+        localStorage.removeItem(WORK_KEY);
+        location.reload();
+      });
+      wrap.appendChild(button);
+    }
+    document.body.appendChild(wrap);
+  };
+
   const reveal = (access, selectedWerk = null) => {
     document.getElementById('defidevEhsLicenseGate')?.remove();
     document.documentElement.classList.remove(CLASS);
     const effective = applyAccessMode(access, selectedWerk);
+    addWerkSwitcher(access, selectedWerk);
     window.dispatchEvent(new CustomEvent('defidev-ehs-entitlement-ready', {
       detail: {
         productId,
@@ -256,7 +290,7 @@
       </select>
       <button type="button" id="defidevEhsWerkOpen">Werk öffnen</button>
       <button type="button" class="secondary" id="defidevEhsLogout">Abmelden</button>
-      <div class="status">Die Auswahl gilt nur für dieses EHS-Modul und kann durch Abmelden zurückgesetzt werden.</div>
+      <div class="status">Die Auswahl gilt nur für dieses EHS-Modul. Bei mehreren Werken können Sie später direkt im Modul wechseln.</div>
     </div>`;
     root.querySelector('#defidevEhsWerkOpen')?.addEventListener('click', () => {
       const id = String(root.querySelector('#defidevEhsWerkSelect')?.value || '');
