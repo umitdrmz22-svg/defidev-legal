@@ -57,10 +57,23 @@ jobs:
           grep -Fq 'Bearbeiter' ehs-company-admin.html
           grep -Fq 'Leser' ehs-company-admin.html
 
+      - name: Vendor provisioning portal contract
+        run: |
+          set -euo pipefail
+          test -s ehs-vendor-admin.html
+          grep -Fq '/functions/v1/ehs-vendor-admin' ehs-vendor-admin.html
+          grep -Fq "action:'createCompany'" ehs-vendor-admin.html
+          grep -Fq "action:'addWerk'" ehs-vendor-admin.html
+          grep -Fq "action:'updateWerk'" ehs-vendor-admin.html
+          grep -Fq 'ownerEmail' ehs-vendor-admin.html
+          grep -Fq '3 Bearbeiter' ehs-vendor-admin.html
+          grep -Fq '5 Leser' ehs-vendor-admin.html
+          grep -Fq 'ehs-company-admin.html' ehs-vendor-admin.html
+
       - name: Security and legal links
         run: |
           set -euo pipefail
-          for page in ehs-online.html ehs-company-admin.html; do
+          for page in ehs-online.html ehs-company-admin.html ehs-vendor-admin.html; do
             grep -Fq 'privacy-ehs.html' "$page"
             grep -Fq 'terms-ehs.html' "$page"
             ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' "$page"
