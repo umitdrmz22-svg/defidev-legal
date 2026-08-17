@@ -13,12 +13,16 @@ permissions:
 jobs:
   gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+
       - name: EHS entitlement gate syntax
         run: node --check ehs-entitlement-gate.js
+
       - name: Required EHS product contracts
         run: |
+          set -euo pipefail
           for product in \
             ehs_ba_monthly \
             ehs_fluchtplan_monthly \
@@ -30,3 +34,35 @@ jobs:
           done
           grep -Fq 'organizationId' ehs-entitlement-gate.js
           grep -Fq 'selectedWerk' ehs-entitlement-gate.js
+
+      - name: Online dashboard contract
+        run: |
+          set -euo pipefail
+          test -s ehs-online.html
+          grep -Fq '/functions/v1/get-ehs-entitlements' ehs-online.html
+          grep -Fq 'werk_id' ehs-online.html || grep -Fq 'werkId' ehs-online.html
+          grep -Fq 'organizationId' ehs-online.html
+          grep -Fq 'ehs_access_token' ehs-online.html
+          ! grep -Eqi '(ip.?lock|device.?lock|ip.?adresse.*werk)' ehs-online.html
+
+      - name: Company admin portal contract
+        run: |
+          set -euo pipefail
+          test -s ehs-company-admin.html
+          grep -Fq '/functions/v1/ehs-company-admin' ehs-company-admin.html
+          grep -Fq "action:'claim'" ehs-company-admin.html
+          grep -Fq "action:'invite'" ehs-company-admin.html
+          grep -Fq "action:'removeMember'" ehs-company-admin.html
+          grep -Fq "action:'revokeInvite'" ehs-company-admin.html
+          grep -Fq 'Bearbeiter' ehs-company-admin.html
+          grep -Fq 'Leser' ehs-company-admin.html
+
+      - name: Security and legal links
+        run: |
+          set -euo pipefail
+          for page in ehs-online.html ehs-company-admin.html; do
+            grep -Fq 'privacy-ehs.html' "$page"
+            grep -Fq 'terms-ehs.html' "$page"
+            ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' "$page"
+            ! grep -Eqi 'service[_-]?role' "$page"
+          done
