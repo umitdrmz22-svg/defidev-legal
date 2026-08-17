@@ -88,10 +88,22 @@ jobs:
           grep -Fq '5 Leser' ehs-vendor-admin.html
           grep -Fq 'ehs-company-admin.html' ehs-vendor-admin.html
 
+      - name: Account deletion contract
+        run: |
+          set -euo pipefail
+          test -s delete-ehs-account.html
+          grep -Fq '/functions/v1/delete-my-account' delete-ehs-account.html
+          grep -Fq 'signInWithPassword' delete-ehs-account.html
+          grep -Fq 'confirmEmail' delete-ehs-account.html
+          grep -Fq "signOut({scope:'local'})" delete-ehs-account.html
+          grep -Fq 'Unternehmensdaten werden nicht' delete-ehs-account.html
+          ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' delete-ehs-account.html
+          ! grep -Eqi 'service[_-]?role' delete-ehs-account.html
+
       - name: Security and legal links
         run: |
           set -euo pipefail
-          for page in ehs-dashboard.html ehs-online.html ehs-company-admin.html ehs-vendor-admin.html; do
+          for page in ehs-dashboard.html ehs-online.html ehs-company-admin.html ehs-vendor-admin.html delete-ehs-account.html; do
             grep -Fq 'privacy-ehs.html' "$page"
             grep -Fq 'terms-ehs.html' "$page"
             ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' "$page"
