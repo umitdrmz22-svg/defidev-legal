@@ -34,6 +34,21 @@ jobs:
           done
           grep -Fq 'organizationId' ehs-entitlement-gate.js
           grep -Fq 'selectedWerk' ehs-entitlement-gate.js
+          grep -Fq 'defidevEhsWerkSwitcher' ehs-entitlement-gate.js
+          grep -Fq "localStorage.removeItem(WORK_KEY)" ehs-entitlement-gate.js
+          grep -Fq "location.reload()" ehs-entitlement-gate.js
+
+      - name: EHS dashboard contract
+        run: |
+          set -euo pipefail
+          test -s ehs-dashboard.html
+          grep -Fq '/functions/v1/get-ehs-entitlements' ehs-dashboard.html
+          grep -Fq 'ehs_ba_monthly' ehs-dashboard.html
+          grep -Fq 'ehs_unfallmanagement_monthly' ehs-dashboard.html
+          grep -Fq 'personal' ehs-dashboard.html
+          grep -Fq 'corporate' ehs-dashboard.html
+          ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' ehs-dashboard.html
+          ! grep -Eqi 'service[_-]?role' ehs-dashboard.html
 
       - name: Online dashboard contract
         run: |
@@ -73,7 +88,7 @@ jobs:
       - name: Security and legal links
         run: |
           set -euo pipefail
-          for page in ehs-online.html ehs-company-admin.html ehs-vendor-admin.html; do
+          for page in ehs-dashboard.html ehs-online.html ehs-company-admin.html ehs-vendor-admin.html; do
             grep -Fq 'privacy-ehs.html' "$page"
             grep -Fq 'terms-ehs.html' "$page"
             ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' "$page"
