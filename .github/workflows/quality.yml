@@ -40,9 +40,9 @@ jobs:
           set -euo pipefail
           test -s ehs-online.html
           grep -Fq '/functions/v1/get-ehs-entitlements' ehs-online.html
-          grep -Fq 'werk_id' ehs-online.html || grep -Fq 'werkId' ehs-online.html
+          grep -Fq 'werkId' ehs-online.html
           grep -Fq 'organizationId' ehs-online.html
-          grep -Fq 'ehs_access_token' ehs-online.html
+          grep -Fq '#ehs_token=' ehs-online.html
           ! grep -Eqi '(ip.?lock|device.?lock|ip.?adresse.*werk)' ehs-online.html
 
       - name: Company admin portal contract
