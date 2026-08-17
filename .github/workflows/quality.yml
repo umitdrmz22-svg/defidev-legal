@@ -100,6 +100,20 @@ jobs:
           grep -Fq '5 Leser' ehs-vendor-admin.html
           grep -Fq 'ehs-company-admin.html' ehs-vendor-admin.html
 
+      - name: EHS business sales contract
+        run: |
+          set -euo pipefail
+          test -s ehs-business.html
+          grep -Fq '24,90 € netto' ehs-business.html
+          grep -Fq '79,90 € netto' ehs-business.html
+          grep -Fq '3 Bearbeiter + 5 Leser' ehs-business.html
+          grep -Fq '7,90 € netto/Monat' ehs-business.html
+          grep -Fq '2,90 € netto/Monat' ehs-business.html
+          grep -Fq 'Werkbezogene Daten' ehs-business.html
+          grep -Fq 'Web + Android' ehs-business.html
+          grep -Fq 'ehs-company-admin.html' ehs-business.html
+          grep -Fq 'privacy-ehs.html' ehs-business.html
+
       - name: Account deletion contract
         run: |
           set -euo pipefail
@@ -111,6 +125,20 @@ jobs:
           grep -Fq 'Unternehmensdaten werden nicht' delete-ehs-account.html
           ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' delete-ehs-account.html
           ! grep -Eqi 'service[_-]?role' delete-ehs-account.html
+
+      - name: Consumer privacy and Ads consistency
+        run: |
+          set -euo pipefail
+          for page in privacy-consumer.html privacy-offline.html; do
+            test -s "$page"
+            grep -Fq 'Google AdMob' "$page"
+            grep -Fq 'Google UMP' "$page"
+            grep -Fq 'IP-Adresse' "$page"
+            grep -Fq 'Geräte' "$page"
+            ! grep -Fq 'verwenden kein Werbe-' "$page"
+          done
+          grep -Fq 'AES-256-GCM' privacy-local-network.html
+          grep -Fq 'CameraDrop betreibt keinen eigenen lokalen Web- oder HTTP-Server mehr' privacy-local-network.html
 
       - name: Security and legal links
         run: |
