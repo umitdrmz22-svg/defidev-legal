@@ -75,6 +75,18 @@ jobs:
           grep -Fq 'Audit-Verlauf' ehs-company-admin.html
           grep -Fq "confirm('Diese Einladung wirklich zurückziehen?')" ehs-company-admin.html
 
+      - name: Invitation password setup contract
+        run: |
+          set -euo pipefail
+          test -s ehs-set-password.html
+          grep -Fq 'detectSessionInUrl:true' ehs-set-password.html
+          grep -Fq 'email_confirmed_at' ehs-set-password.html
+          grep -Fq 'minlength="12"' ehs-set-password.html
+          grep -Fq 'sb.auth.updateUser({password:p})' ehs-set-password.html
+          grep -Fq "location.replace('ehs-company-admin.html')" ehs-set-password.html
+          ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' ehs-set-password.html
+          ! grep -Eqi 'service[_-]?role' ehs-set-password.html
+
       - name: Vendor provisioning portal contract
         run: |
           set -euo pipefail
@@ -103,7 +115,7 @@ jobs:
       - name: Security and legal links
         run: |
           set -euo pipefail
-          for page in ehs-dashboard.html ehs-online.html ehs-company-admin.html ehs-vendor-admin.html delete-ehs-account.html; do
+          for page in ehs-dashboard.html ehs-online.html ehs-company-admin.html ehs-set-password.html ehs-vendor-admin.html delete-ehs-account.html; do
             grep -Fq 'privacy-ehs.html' "$page"
             grep -Fq 'terms-ehs.html' "$page"
             ! grep -Fq 'SUPABASE_SERVICE_ROLE_KEY' "$page"
