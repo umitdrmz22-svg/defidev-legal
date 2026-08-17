@@ -71,6 +71,9 @@ jobs:
           grep -Fq "action:'revokeInvite'" ehs-company-admin.html
           grep -Fq 'Bearbeiter' ehs-company-admin.html
           grep -Fq 'Leser' ehs-company-admin.html
+          grep -Fq 'auditEvents' ehs-company-admin.html
+          grep -Fq 'Audit-Verlauf' ehs-company-admin.html
+          grep -Fq "confirm('Diese Einladung wirklich zurückziehen?')" ehs-company-admin.html
 
       - name: Vendor provisioning portal contract
         run: |
