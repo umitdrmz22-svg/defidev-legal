@@ -11,7 +11,7 @@
 <header><div class="wrap">
   <a class="brand" href="index.html"><span class="brand-mark">D</span> DefiDev</a>
   <h1>Datenschutzerklärung – Consumer Apps</h1>
-  <p class="meta">Stand: 17. August 2026</p>
+  <p class="meta">Stand: 15. September 2026</p>
   <nav><a href="privacy.html">Datenschutz</a><a href="terms-consumer.html">Nutzungsbedingungen</a><a href="impressum.html">Impressum</a><a href="support.html">Support</a></nav>
 </div></header>
 <main class="wrap">
@@ -52,7 +52,8 @@
 <section class="card">
   <h2>6. Google Play Billing / In-App-Kauf</h2>
   <p>Zum Kauf der Option <strong>„Werbung entfernen“</strong> wird Google Play Billing verwendet. Zahlungsdaten werden nicht von DefiDev erhoben oder gespeichert. Die Zahlungsabwicklung erfolgt über Google Play. Die App erhält zur Freischaltung insbesondere Informationen zum Produkt, Kaufstatus und einen von Google bereitgestellten Kaufnachweis/Token. Diese Verarbeitung ist zur Vertragserfüllung erforderlich (Art. 6 Abs. 1 lit. b DSGVO).</p>
-  <p>Ein Kauf wird technisch bestätigt (acknowledged), damit die dauerhafte Berechtigung korrekt bereitgestellt werden kann. Die App prüft vorhandene Käufe außerdem beim Start bzw. beim Wiederherstellen der Berechtigung.</p>
+  <p>Zur Missbrauchsvermeidung und sicheren Freischaltung wird der Kauf serverseitig geprüft. Hierfür übermittelt die App verschlüsselt über HTTPS/TLS den App-Paketnamen, die Produkt-ID und den Google-Play-Kauftoken an einen von DefiDev über die Supabase-Plattform betriebenen Prüf-Endpunkt. Der Prüf-Endpunkt verwendet diese Angaben ausschließlich, um den Kaufstatus über die Google-Play-Developer-Schnittstelle zu validieren und die Berechtigung technisch zu bestätigen. Der Kauftoken wird durch diese Funktion nicht in einer DefiDev-App-Datenbank gespeichert.</p>
+  <p>Ein gültiger Kauf wird technisch bestätigt (acknowledged), damit die dauerhafte Berechtigung korrekt bereitgestellt werden kann. Die App prüft vorhandene Käufe außerdem beim Start bzw. beim Wiederherstellen der Berechtigung.</p>
 </section>
 <section class="card">
   <h2>7. App-spezifische Gerätefunktionen</h2>
@@ -69,11 +70,11 @@
 </section>
 <section class="card">
   <h2>8. Empfänger und Drittlandübermittlungen</h2>
-  <p>Bei Nutzung von AdMob, UMP und Google Play Billing werden Daten an Google-Unternehmen bzw. deren Auftragsverarbeiter übermittelt. Dabei kann eine Verarbeitung außerhalb des EWR stattfinden. Google beschreibt die hierfür eingesetzten Datenschutzmechanismen in den eigenen Datenschutzhinweisen und Vertragsbedingungen. DefiDev verkauft keine personenbezogenen Nutzerdaten an Werbetreibende oder Datenhändler.</p>
+  <p>Bei Nutzung von AdMob, UMP und Google Play Billing werden Daten an Google-Unternehmen bzw. deren Auftragsverarbeiter übermittelt. Für die serverseitige Kaufprüfung wird außerdem die Supabase-Plattform als technische Infrastruktur eingesetzt. Dabei kann eine Verarbeitung außerhalb des EWR stattfinden. Die jeweiligen Anbieter beschreiben die hierfür eingesetzten Datenschutzmechanismen in ihren Datenschutzhinweisen und Vertragsbedingungen. DefiDev verkauft keine personenbezogenen Nutzerdaten an Werbetreibende oder Datenhändler.</p>
 </section>
 <section class="card">
   <h2>9. Speicherdauer</h2>
-  <p>Lokal gespeicherte App-Daten bleiben grundsätzlich auf dem Gerät, bis sie durch die App-Funktion, den Nutzer oder durch Deinstallation gelöscht werden. Für Daten, die Google im Zusammenhang mit Werbung, Consent oder Käufen verarbeitet, gelten die jeweiligen Speicherfristen des Anbieters. Kaufberechtigungen können zur Wiederherstellung mit dem Google-Play-Konto verknüpft sein.</p>
+  <p>Lokal gespeicherte App-Daten bleiben grundsätzlich auf dem Gerät, bis sie durch die App-Funktion, den Nutzer oder durch Deinstallation gelöscht werden. Für Daten, die Google im Zusammenhang mit Werbung, Consent oder Käufen verarbeitet, gelten die jeweiligen Speicherfristen des Anbieters. Kaufberechtigungen können zur Wiederherstellung mit dem Google-Play-Konto verknüpft sein. Der DefiDev-Prüf-Endpunkt speichert den übermittelten Kauftoken nicht in einer DefiDev-App-Datenbank; technische Betriebsprotokolle der eingesetzten Infrastruktur können nach den jeweiligen Plattformbedingungen anfallen.</p>
 </section>
 <section class="card">
   <h2>10. Rechte betroffener Personen</h2>
@@ -89,6 +90,6 @@
   <p>Maßgeblich sind insbesondere die Datenschutz-Grundverordnung (EU) 2016/679, insbesondere Art. 5, 6, 7, 13 und 15–21 DSGVO, sowie § 25 TDDDG. Für die technische Werbeeinwilligung wird Google UMP eingesetzt; für In-App-Käufe Google Play Billing.</p>
 </section>
 </main>
-<footer class="wrap">DefiDev / Ümit Durmaz · Stand: 17. August 2026 · <a href="index.html">Übersicht</a></footer>
+<footer class="wrap">DefiDev / Ümit Durmaz · Stand: 15. September 2026 · <a href="index.html">Übersicht</a></footer>
 </body>
 </html>
