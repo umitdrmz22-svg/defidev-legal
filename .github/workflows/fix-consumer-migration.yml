@@ -1,9 +1,6 @@
 name: Fix consumer migration script
 
 on:
-  push:
-    branches: [main]
-    paths: [".github/workflows/fix-consumer-migration.yml"]
   workflow_dispatch:
 
 permissions:
