@@ -1,6 +1,14 @@
 name: Publish legal pages
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**.html"
+      - "**.css"
+      - ".nojekyll"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
